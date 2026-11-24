@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Earnings Tracker</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <h1>Earnings Tracker</h1>
+    <span class="sub" id="updated">Loading…</span>
+  </div>
+  <div class="range">
+    <div class="seg" id="presets">
+      <button data-preset="today">Today</button>
+      <button data-preset="week" class="on">This week</button>
+      <button data-preset="next">Next week</button>
+    </div>
+    <label class="field">From <input type="date" id="from"></label>
+    <label class="field">Days
+      <select id="days">
+        <option>1</option><option>2</option><option>3</option><option>4</option>
+        <option selected>5</option><option>10</option><option>15</option>
+      </select>
+    </label>
+    <button id="refresh" class="btn" title="Refresh prices">↻ Refresh</button>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- ============ Left: navigation + favorites ============ -->
+  <aside class="side">
+    <nav class="nav" id="nav">
+      <button data-view="overview" class="on"><span>◎ Overview</span><span class="count" id="navOverview"></span></button>
+      <button data-view="screen"><span>☰ Stock Screen</span><span class="count" id="navScreen"></span></button>
+      <button data-view="history"><span>⟲ Historical</span><span class="count" id="navHistory"></span></button>
+    </nav>
+    <div class="side-head">
+      <h2>★ Favorites</h2>
+      <button class="btn small ghost" id="addManual" title="Add any ticker">+ Add</button>
+    </div>
+    <div class="side-total" id="sideTotal"></div>
+    <div id="favList" class="fav-list"></div>
+  </aside>
+
+  <div class="content">
+    <!-- ============ Overview ============ -->
+    <section class="view" id="view-overview">
+      <div class="stats" id="ovStats"></div>
+      <div class="ov-grid">
+        <div class="ov-main">
+          <div class="section-head">
+            <h2>🔥 Hot opportunities</h2>
+            <span class="hint inline" id="hotHint"></span>
+          </div>
+          <div class="hot" id="hot"></div>
+
+          <div class="section-head">
+            <h2>▼ Bearish watch</h2>
+            <span class="hint inline">Lowest scores that fit your parameters</span>
+          </div>
+          <div class="table-wrap compact"><table><tbody id="bearList"></tbody></table></div>
+        </div>
+
+        <aside class="rules-panel">
+          <div class="section-head">
+            <h2>Rules</h2>
+            <button class="btn small ghost" id="resetRules">Reset</button>
+          </div>
+          <p class="hint">Every stock is scored by these rules. Edit any number. The total sets its outlook.</p>
+          <div id="rulesList"></div>
+          <div class="rule thresholds" id="thresholds"></div>
+
+          <h3 class="sub-head">My parameters</h3>
+          <p class="hint">Which stocks qualify for the Overview.</p>
+          <div class="params" id="params"></div>
+          <p class="hint small-print">Rule-based signals from public data, not investment advice.</p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ Stock screen ============ -->
+    <section class="view" id="view-screen" hidden>
+      <div class="filters">
+        <input id="search" type="search" placeholder="Search symbol or company…" autocomplete="off">
+        <div class="seg" id="timing">
+          <button data-time="all" class="on">All</button>
+          <button data-time="pre">☀ Pre-market</button>
+          <button data-time="after">☾ After hours</button>
+          <button data-time="unknown">Not set</button>
+        </div>
+        <div class="seg" id="outlookFilter">
+          <button data-outlook="all" class="on">Any outlook</button>
+          <button data-outlook="bullish">▲ Bullish</button>
+          <button data-outlook="neutral">● Neutral</button>
+          <button data-outlook="bearish">▼ Bearish</button>
+        </div>
+        <label class="field">Min market cap
+          <select id="mincap">
+            <option value="0">Any</option>
+            <option value="300e6">$300M+</option>
+            <option value="2e9" selected>$2B+</option>
+            <option value="10e9">$10B+</option>
+            <option value="200e9">$200B+</option>
+          </select>
+        </label>
+        <label class="check"><input type="checkbox" id="group" checked> Group by day</label>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div class="table-wrap">
+        <table id="tbl">
+          <thead>
+            <tr>
+              <th class="star"></th>
+              <th data-sort="symbol">Company</th>
+              <th data-sort="date">Date</th>
+              <th data-sort="time">Time</th>
+              <th data-sort="score">Outlook</th>
+              <th data-sort="price" class="num">Price</th>
+              <th data-sort="changePct" class="num">Chg %</th>
+              <th data-sort="marketCap" class="num">Mkt cap</th>
+              <th data-sort="trailingPE" class="num">P/E</th>
+              <th data-sort="forwardPE" class="num">Fwd P/E</th>
+              <th data-sort="rangePos" class="range-col">52-week range</th>
+              <th data-sort="pctFromHigh" class="num">From high</th>
+              <th data-sort="epsForecast" class="num">EPS est.</th>
+              <th data-sort="lastYearEPS" class="num">Last yr EPS</th>
+              <th data-sort="beats" class="num">Beats</th>
+              <th data-sort="analystRating" class="num">Analysts</th>
+            </tr>
+          </thead>
+          <tbody id="body"></tbody>
+        </table>
+        <p class="empty" id="empty" hidden>No earnings match these filters.</p>
+      </div>
+    </section>
+
+    <!-- ============ Historical ============ -->
+    <section class="view" id="view-history" hidden>
+      <div class="stats" id="perfStats"></div>
+      <div class="filters">
+        <div class="seg" id="perfFilter">
+          <button data-status="all" class="on">All</button>
+          <button data-status="open">Open</button>
+          <button data-status="closed">Closed</button>
+        </div>
+        <span class="hint inline">Every stock you favorite is tracked here from your entry price, as a paper trade before you buy for real.</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Status</th>
+              <th>Outlook at entry</th>
+              <th>Earnings</th>
+              <th>Entry</th>
+              <th class="num">Entry price</th>
+              <th class="num">Shares</th>
+              <th class="num">Now / exit</th>
+              <th class="num">P/L</th>
+              <th class="num">P/L %</th>
+              <th class="num">Days</th>
+              <th>Call</th>
+            </tr>
+          </thead>
+          <tbody id="perfBody"></tbody>
+        </table>
+        <p class="empty" id="perfEmpty" hidden>Nothing tracked yet. Star a stock on the Overview or Stock Screen to start tracking it.</p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<footer class="foot">
+  Earnings calendar: Nasdaq · Quotes, history &amp; analyst data: Yahoo Finance (may be delayed) · Prices refresh every 2 minutes. Not investment advice.
+</footer>
+
+<!-- ============ Add / edit position ============ -->
+<dialog id="posDialog">
+  <form method="dialog" id="posForm">
+    <h3 id="posTitle">Add to favorites</h3>
+    <label>Ticker <input name="symbol" required autocomplete="off" placeholder="e.g. AAPL"></label>
+    <div class="row2">
+      <label>Entry date <input type="date" name="entryDate" required></label>
+      <label>Entry price <input type="number" name="entryPrice" step="0.01" min="0.01" required></label>
+    </div>
+    <p class="hint" id="priceHint"></p>
+    <label>Shares <input type="number" name="shares" step="any" min="0" value="1"></label>
+    <div class="outlook-box" id="posOutlook"></div>
+    <label>Notes <textarea name="notes" rows="3" placeholder="Why this trade? What do you expect from earnings?"></textarea></label>
+    <p class="error" id="posError"></p>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="posCancel">Cancel</button>
+      <button type="submit" class="btn" id="posSave">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ============ Position detail ============ -->
+<dialog id="detailDialog" class="wide"><div id="detailBody"></div></dialog>
+
+<!-- ============ Score breakdown ============ -->
+<dialog id="whyDialog"><div id="whyBody"></div></dialog>
+
+<script src="rules.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
