@@ -845,6 +845,12 @@ document.addEventListener('click', (e) => {
 });
 $('#addManual').addEventListener('click', () => openAdd());
 
+// Phone layout: the rail is a slide-in drawer.
+const setMenu = (open) => document.body.classList.toggle('menu-open', open);
+$('#menuBtn').addEventListener('click', () => setMenu(true));
+$('#scrim').addEventListener('click', () => setMenu(false));
+$('#side').addEventListener('click', (e) => { if (e.target.closest('[data-view], [data-pos], #addManual')) setMenu(false); });
+
 // ---------- init ----------
 const savedFilters = load('filters', null);
 if (savedFilters) {

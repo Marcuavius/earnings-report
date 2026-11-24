@@ -7,31 +7,10 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header class="top">
-  <div class="brand">
-    <h1>Earnings Tracker</h1>
-    <span class="sub" id="updated">Loading…</span>
-  </div>
-  <div class="range">
-    <div class="seg" id="presets">
-      <button data-preset="today">Today</button>
-      <button data-preset="week" class="on">This week</button>
-      <button data-preset="next">Next week</button>
-    </div>
-    <label class="field">From <input type="date" id="from"></label>
-    <label class="field">Days
-      <select id="days">
-        <option>1</option><option>2</option><option>3</option><option>4</option>
-        <option selected>5</option><option>10</option><option>15</option>
-      </select>
-    </label>
-    <button id="refresh" class="btn" title="Refresh prices">↻ Refresh</button>
-  </div>
-</header>
-
-<div class="layout">
-  <!-- ============ Left: navigation + favorites ============ -->
-  <aside class="side">
+<div class="app">
+  <!-- ============ Left rail: navigation + favorites ============ -->
+  <aside class="side" id="side">
+    <div class="brand"><h1>Earnings Tracker</h1></div>
     <nav class="nav" id="nav">
       <button data-view="overview" class="on"><span>◎ Overview</span><span class="count" id="navOverview"></span></button>
       <button data-view="screen"><span>☰ Stock Screen</span><span class="count" id="navScreen"></span></button>
@@ -45,6 +24,26 @@
     <div id="favList" class="fav-list"></div>
   </aside>
 
+  <div class="main">
+  <header class="top">
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+    <span class="sub" id="updated">Loading…</span>
+    <div class="range">
+    <div class="seg" id="presets">
+      <button data-preset="today">Today</button>
+      <button data-preset="week" class="on">This week</button>
+      <button data-preset="next">Next week</button>
+    </div>
+    <label class="field">From <input type="date" id="from"></label>
+    <label class="field">Days
+      <select id="days">
+        <option>1</option><option>2</option><option>3</option><option>4</option>
+        <option selected>5</option><option>10</option><option>15</option>
+      </select>
+    </label>
+      <button id="refresh" class="btn" title="Refresh prices">↻ Refresh</button>
+    </div>
+  </header>
   <div class="content">
     <!-- ============ Overview ============ -->
     <section class="view" id="view-overview">
@@ -172,11 +171,12 @@
       </div>
     </section>
   </div>
+  <footer class="foot">
+    Earnings calendar: Nasdaq · Quotes, history &amp; analyst data: Yahoo Finance (may be delayed) · Prices refresh every 2 minutes. Not investment advice.
+  </footer>
+  </div>
 </div>
-
-<footer class="foot">
-  Earnings calendar: Nasdaq · Quotes, history &amp; analyst data: Yahoo Finance (may be delayed) · Prices refresh every 2 minutes. Not investment advice.
-</footer>
+<div class="scrim" id="scrim"></div>
 
 <!-- ============ Add / edit position ============ -->
 <dialog id="posDialog">
